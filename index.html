@@ -1,0 +1,1632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>🏠 Erie → LA Return Trip</title>
+<style>
+  :root {
+    --terracotta: #c1694f;
+    --terracotta-light: #e8a48e;
+    --plum: #7a4f6d;
+    --plum-light: #b08aa0;
+    --teal: #78c8b4;
+    --teal-dark: #4a9e8c;
+    --olive: #7d8c5c;
+    --olive-light: #b5c48a;
+    --cream: #f8f3ec;
+    --cream-dark: #ede5d8;
+    --brown: #5c3d2e;
+    --text: #2d2118;
+    --text-light: #6b5344;
+    --white: #ffffff;
+    --shadow: rgba(45,33,24,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    font-size: 16px;
+    line-height: 1.6;
+    padding-bottom: 40px;
+  }
+
+  /* ── HEADER ── */
+  .hero {
+    background: linear-gradient(135deg, var(--brown) 0%, var(--plum) 60%, var(--teal-dark) 100%);
+    color: var(--white);
+    padding: 28px 20px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 40px,
+      rgba(255,255,255,0.03) 40px,
+      rgba(255,255,255,0.03) 80px
+    );
+  }
+  .hero-inner { position: relative; z-index: 1; }
+  .hero-emoji { font-size: 2.8rem; display: block; margin-bottom: 6px; }
+  .hero h1 {
+    font-size: 1.7rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+  .hero-sub {
+    font-size: 1rem;
+    opacity: 0.85;
+    margin-bottom: 14px;
+  }
+  .hero-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 4px;
+  }
+  .pill {
+    background: rgba(255,255,255,0.18);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+
+  /* ── DAY TABS ── */
+  .day-nav {
+    display: flex;
+    background: var(--brown);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+  .day-nav::-webkit-scrollbar { display: none; }
+  .day-tab {
+    flex: 1;
+    min-width: 90px;
+    padding: 12px 6px;
+    text-align: center;
+    color: rgba(255,255,255,0.65);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    border: none;
+    background: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .day-tab.active {
+    color: var(--teal);
+    border-bottom: 3px solid var(--teal);
+  }
+
+  /* ── MAIN CONTENT ── */
+  .day-panel { display: none; padding: 0 16px; }
+  .day-panel.active { display: block; }
+
+  /* ── DAY HEADER ── */
+  .day-header {
+    background: var(--cream-dark);
+    border-left: 5px solid var(--terracotta);
+    border-radius: 0 10px 10px 0;
+    padding: 14px 16px;
+    margin: 16px 0 12px;
+  }
+  .day-header h2 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--brown);
+    margin-bottom: 3px;
+  }
+  .day-header .day-meta {
+    font-size: 0.88rem;
+    color: var(--text-light);
+    font-weight: 500;
+  }
+  .day-header .day-note {
+    font-size: 0.84rem;
+    color: var(--terracotta);
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  /* ── SECTION ACCORDION ── */
+  .section {
+    background: var(--white);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px var(--shadow);
+    overflow: hidden;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
+    min-height: 56px;
+  }
+  .section-icon {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    width: 32px;
+    text-align: center;
+  }
+  .section-title {
+    flex: 1;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--brown);
+    line-height: 1.3;
+  }
+  .section-subtitle {
+    font-size: 0.78rem;
+    color: var(--text-light);
+    font-weight: 500;
+    margin-top: 2px;
+  }
+  .chevron {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    transition: transform 0.25s;
+    flex-shrink: 0;
+  }
+  .section.open .chevron { transform: rotate(180deg); }
+  .section-body {
+    display: none;
+    padding: 0 16px 16px;
+    border-top: 1px solid var(--cream-dark);
+    overflow-x: hidden;
+  }
+  .section.open .section-body { display: block; }
+
+  /* ── STOP CARDS ── */
+  .stop {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--cream-dark);
+  }
+  .stop:last-child { border-bottom: none; }
+  .stop-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 3px;
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    flex-wrap: wrap;
+  }
+  .stop-name .badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .badge-must { background: var(--terracotta); color: white; }
+  .badge-rec  { background: var(--olive); color: white; }
+  .badge-opt  { background: var(--plum-light); color: white; }
+  .badge-free { background: var(--teal-dark); color: white; }
+
+  .stop-detail {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 3px;
+    padding-left: 0;
+  }
+  .stop-tip {
+    font-size: 0.85rem;
+    color: var(--olive);
+    font-style: italic;
+  }
+  .map-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--teal-dark);
+    text-decoration: none;
+    padding: 4px 10px;
+    background: rgba(120,200,180,0.12);
+    border-radius: 20px;
+    border: 1px solid rgba(120,200,180,0.35);
+  }
+  .map-link:active { background: rgba(120,200,180,0.25); }
+
+  /* ── CHARGER CARDS ── */
+  .charger-card {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    color: white;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 10px 0;
+    border-left: 4px solid var(--teal);
+  }
+  .charger-card .charger-name {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--teal);
+    margin-bottom: 3px;
+  }
+  .charger-card .charger-detail {
+    font-size: 0.86rem;
+    opacity: 0.85;
+    margin-bottom: 6px;
+  }
+  .charger-card .map-link {
+    background: rgba(120,200,180,0.15);
+    border-color: rgba(120,200,180,0.4);
+    color: var(--teal);
+  }
+
+  /* ── HOTEL CARDS ── */
+  .hotel-card {
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 10px 0;
+    border: 1px solid var(--cream-dark);
+    background: var(--cream);
+  }
+  .hotel-card.top-pick {
+    border-color: var(--terracotta);
+    background: linear-gradient(135deg, #fff8f5, #fff3ef);
+  }
+  .hotel-top-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--terracotta);
+    margin-bottom: 4px;
+  }
+  .hotel-name {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--brown);
+    margin-bottom: 3px;
+  }
+  .hotel-meta {
+    font-size: 0.86rem;
+    color: var(--text-light);
+    margin-bottom: 4px;
+  }
+  .hotel-quote {
+    font-size: 0.84rem;
+    color: var(--plum);
+    font-style: italic;
+    margin-bottom: 6px;
+  }
+  .rating-stars {
+    color: #f5a623;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-right: 4px;
+  }
+
+  /* ── FOOD CARDS ── */
+  .food-card {
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 10px 0;
+    background: #fff8f0;
+    border-left: 4px solid var(--terracotta-light);
+  }
+  .food-card.must-eat {
+    background: linear-gradient(135deg, #fff5ee, #fff0e5);
+    border-left-color: var(--terracotta);
+  }
+  .food-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--terracotta);
+    margin-bottom: 3px;
+  }
+  .food-name {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--brown);
+    margin-bottom: 3px;
+  }
+  .food-detail {
+    font-size: 0.86rem;
+    color: var(--text-light);
+    margin-bottom: 4px;
+  }
+
+  /* ── DOG WALK CARDS ── */
+  .dog-card {
+    background: linear-gradient(135deg, #f0fff8, #e8f8f3);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 10px 0;
+    border-left: 4px solid var(--teal);
+  }
+  .dog-label {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--teal-dark);
+    margin-bottom: 3px;
+  }
+  .dog-name {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--brown);
+    margin-bottom: 3px;
+  }
+  .dog-detail {
+    font-size: 0.86rem;
+    color: var(--text-light);
+  }
+
+  /* ── SCENERY / CALLOUT BOXES ── */
+  .callout {
+    background: linear-gradient(135deg, #f5eeff, #ede5ff);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 10px 0;
+    border-left: 4px solid var(--plum);
+    font-size: 0.9rem;
+    color: var(--plum);
+  }
+  .callout strong { color: var(--brown); }
+
+  /* ── SUMMARY TABLE ── */
+  .table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 8px;
+  }
+  .summary-table {
+    width: 100%;
+    min-width: 280px;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  .summary-table th {
+    background: var(--brown);
+    color: white;
+    padding: 9px 12px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .summary-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--cream-dark);
+    color: var(--text);
+  }
+  .summary-table tr:last-child td {
+    background: var(--cream-dark);
+    font-weight: 800;
+    color: var(--brown);
+    font-size: 1rem;
+  }
+  .summary-table tr:nth-child(even) td { background: var(--cream); }
+
+  /* ── DAYLIGHT BAR ── */
+  .daylight-bar {
+    background: var(--cream-dark);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 10px 0;
+    font-size: 0.88rem;
+  }
+  .daylight-bar .dl-label {
+    font-weight: 700;
+    color: var(--brown);
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+  }
+  .bar-track {
+    background: #2d2118;
+    border-radius: 6px;
+    height: 20px;
+    position: relative;
+    overflow: hidden;
+    margin: 6px 0 4px;
+  }
+  .bar-day {
+    position: absolute;
+    top: 0; bottom: 0;
+    background: linear-gradient(90deg, #f5a623, #f9d068, #f9c74f);
+    border-radius: 0 4px 4px 0;
+  }
+  .bar-drive {
+    position: absolute;
+    top: 0; bottom: 0;
+    background: var(--teal);
+    opacity: 0.85;
+  }
+  .bar-legend {
+    display: flex;
+    gap: 14px;
+    font-size: 0.78rem;
+    color: var(--text-light);
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .bar-legend span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    display: inline-block;
+  }
+
+  /* ── MISC ── */
+  .section-divider {
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    padding: 10px 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--cream-dark);
+  }
+
+  .time-badge {
+    display: inline-block;
+    background: var(--plum);
+    color: white;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 6px;
+  }
+
+  .overnight-banner {
+    background: linear-gradient(135deg, var(--plum), #5c3a52);
+    color: white;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin: 8px 0;
+    text-align: center;
+  }
+  .overnight-banner .ob-title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 3px;
+  }
+  .overnight-banner .ob-sub {
+    font-size: 0.86rem;
+    opacity: 0.85;
+  }
+
+  .arrive-banner {
+    background: linear-gradient(135deg, var(--teal-dark), var(--olive));
+    color: white;
+    border-radius: 10px;
+    padding: 16px;
+    margin: 12px 0;
+    text-align: center;
+  }
+  .arrive-banner .ab-emoji { font-size: 2rem; display: block; margin-bottom: 4px; }
+  .arrive-banner .ab-title { font-size: 1.2rem; font-weight: 800; }
+  .arrive-banner .ab-sub { font-size: 0.9rem; opacity: 0.9; margin-top: 3px; }
+
+  /* ── OVERVIEW TAB ── */
+  .route-overview {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 12px 0;
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+  .route-overview h3 {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--brown);
+    margin-bottom: 10px;
+  }
+  .route-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--cream-dark);
+  }
+  .route-step:last-child { border-bottom: none; }
+  .route-dot {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .dot-day1 { background: var(--terracotta); color: white; }
+  .dot-night { background: var(--plum); color: white; }
+  .dot-day2 { background: var(--teal-dark); color: white; }
+  .dot-home { background: var(--olive); color: white; }
+  .route-step-text { flex: 1; }
+  .route-step-label { font-weight: 700; font-size: 0.95rem; color: var(--text); }
+  .route-step-sub { font-size: 0.82rem; color: var(--text-light); margin-top: 1px; }
+
+  /* ── TOWN TIMELINE ── */
+  .town-timeline {
+    margin: 10px 0;
+    position: relative;
+  }
+  .town-timeline::before {
+    content: '';
+    position: absolute;
+    left: 62px;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: var(--cream-dark);
+  }
+  .town-row {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--cream-dark);
+    position: relative;
+  }
+  .town-row:last-child { border-bottom: none; }
+  .town-time {
+    flex-shrink: 0;
+    width: 58px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--plum);
+    text-align: right;
+    padding-top: 2px;
+    line-height: 1.3;
+  }
+  .town-content {
+    flex: 1;
+    padding-left: 14px;
+    position: relative;
+  }
+  .town-content::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 7px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--cream-dark);
+    border: 2px solid var(--plum-light);
+    z-index: 1;
+  }
+  .town-row-final .town-content::before {
+    background: var(--plum);
+    border-color: var(--plum);
+    width: 12px; height: 12px;
+    left: -7px;
+  }
+  .town-name {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--brown);
+    margin-bottom: 3px;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .town-detail {
+    font-size: 0.86rem;
+    color: var(--text-light);
+    margin-bottom: 5px;
+  }
+  .town-note {
+    font-size: 0.83rem;
+    color: var(--text-light);
+    font-style: italic;
+    margin-bottom: 6px;
+  }
+
+  /* ── LUNCH BOXES ── */
+  .lunch-box {
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin: 8px 0;
+    border-left: 4px solid;
+  }
+  .early-lunch {
+    background: #fff7ed;
+    border-color: var(--terracotta);
+  }
+  .mid-lunch {
+    background: #f5f7ed;
+    border-color: var(--olive);
+  }
+  .late-lunch {
+    background: #f0f7ff;
+    border-color: var(--teal-dark);
+  }
+  .lunch-box-label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 6px;
+  }
+  .food-name-inline {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--brown);
+    margin-bottom: 2px;
+  }
+  .food-detail-inline {
+    font-size: 0.83rem;
+    color: var(--text-light);
+    margin-bottom: 5px;
+  }
+  .charger-inline {
+    font-size: 0.83rem;
+    color: var(--teal-dark);
+    font-weight: 600;
+    margin: 6px 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .charger-inline .map-link {
+    flex-shrink: 0;
+    margin-left: 0;
+  }
+  .charger-tag {
+    background: rgba(74,158,140,0.12);
+    border-radius: 10px;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+  .dog-inline {
+    font-size: 0.82rem;
+    color: var(--teal-dark);
+    margin-top: 6px;
+  }
+
+  @media (min-width: 600px) {
+    body { max-width: 680px; margin: 0 auto; }
+    .hero { border-radius: 0 0 20px 20px; }
+    .day-nav { position: sticky; top: 0; border-radius: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <span class="hero-emoji">🏠</span>
+    <h1>Erie → Los Angeles</h1>
+    <div class="hero-sub">The Return Trip · June 13–14, 2026</div>
+    <div class="hero-pills">
+      <span class="pill">⚡ Tesla Model Y</span>
+      <span class="pill">🐾 Dog Friendly</span>
+      <span class="pill">~1,000 mi</span>
+      <span class="pill">2 Days</span>
+      <span class="pill">☀️ Daylight Only</span>
+    </div>
+  </div>
+</div>
+
+<!-- NAV TABS -->
+<div class="day-nav" role="tablist">
+  <button class="day-tab active" onclick="showDay('overview')" role="tab">Overview</button>
+  <button class="day-tab" onclick="showDay('day1')" role="tab">Day 1 · Fri</button>
+  <button class="day-tab" onclick="showDay('day2')" role="tab">Day 2 · Sat</button>
+  <button class="day-tab" onclick="showDay('logistics')" role="tab">Logistics</button>
+</div>
+
+<!-- ══════════════════════════════ OVERVIEW ══════════════════════════════ -->
+<div id="overview" class="day-panel active">
+
+  <div class="day-header">
+    <div class="day-header h2" style="font-size:1.2rem;font-weight:800;color:#5c3d2e;margin-bottom:3px;">Route Summary</div>
+    <div class="day-meta">Erie, CO → St. George, UT → Los Angeles, CA</div>
+    <div class="day-note">✅ Daylight driving only · June daylight 15+ hrs/day</div>
+  </div>
+
+  <div class="route-overview">
+    <h3>📍 The Route</h3>
+    <div class="route-step">
+      <div class="route-dot dot-day1">1</div>
+      <div class="route-step-text">
+        <div class="route-step-label">Erie, CO → Grand Junction, CO</div>
+        <div class="route-step-sub">I-70 W · ~266 mi · ~4h 45m · Glenwood Canyon 🏔️</div>
+      </div>
+    </div>
+    <div class="route-step">
+      <div class="route-dot dot-day1">→</div>
+      <div class="route-step-text">
+        <div class="route-step-label">Grand Junction → St. George, UT</div>
+        <div class="route-step-sub">I-70 W → I-15 S · ~310 mi · ~4h 30m</div>
+      </div>
+    </div>
+    <div class="route-step">
+      <div class="route-dot dot-night">🌙</div>
+      <div class="route-step-text">
+        <div class="route-step-label">Overnight: St. George, UT</div>
+        <div class="route-step-sub">La Quinta Inn &amp; Suites · Pet friendly · 9.4/10</div>
+      </div>
+    </div>
+    <div class="route-step">
+      <div class="route-dot dot-day2">2</div>
+      <div class="route-step-text">
+        <div class="route-step-label">St. George → Los Angeles, CA</div>
+        <div class="route-step-sub">I-15 S · ~420 mi · ~5h 30m · Las Vegas bypass</div>
+      </div>
+    </div>
+    <div class="route-step">
+      <div class="route-dot dot-home">🏠</div>
+      <div class="route-step-text">
+        <div class="route-step-label">Arrive Los Angeles</div>
+        <div class="route-step-sub">~12:30–1:30 PM PST · Sunset at 8:03 PM</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section open">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">☀️</span>
+      <div>
+        <div class="section-title">Daylight Windows</div>
+        <div class="section-subtitle">You have plenty of light — near summer solstice</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="daylight-bar">
+        <div class="dl-label">Friday June 13 — Erie, CO (Mountain Time)</div>
+        <div class="bar-track">
+          <div class="bar-day" style="left:0;width:100%;"></div>
+          <div class="bar-drive" style="left:0%;width:58%;"></div>
+        </div>
+        <div class="bar-legend">
+          <span><span class="legend-dot" style="background:#f5a623"></span>Daylight 5:31 AM – 8:31 PM (~15 hrs)</span>
+          <span><span class="legend-dot" style="background:#78c8b4"></span>Your drive 6:00 AM – ~5:30 PM</span>
+        </div>
+      </div>
+      <div class="daylight-bar" style="margin-top:8px;">
+        <div class="dl-label">Saturday June 14 — St. George → LA (Pacific Time)</div>
+        <div class="bar-track">
+          <div class="bar-day" style="left:0;width:100%;"></div>
+          <div class="bar-drive" style="left:15%;width:50%;"></div>
+        </div>
+        <div class="bar-legend">
+          <span><span class="legend-dot" style="background:#f5a623"></span>Daylight 5:24 AM – 8:03 PM (~14.5 hrs)</span>
+          <span><span class="legend-dot" style="background:#78c8b4"></span>Your drive ~7:00 AM – ~12:30 PM</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section open">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">⚡</span>
+      <div>
+        <div class="section-title">Charging Plan at a Glance</div>
+        <div class="section-subtitle">4 Supercharger stops total</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="stop">
+        <div class="stop-name">1. Grand Junction, CO <span class="badge badge-free">DAY 1</span></div>
+        <div class="stop-detail">2432 US-6 · ~266 mi from Erie · Across from mall, chain food nearby</div>
+        <a href="https://www.google.com/maps/place/Tesla+Supercharger/@39.0649,-108.5489,15z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+      <div class="stop">
+        <div class="stop-name">2. St. George, UT (overnight charge) <span class="badge badge-free">DAY 1</span></div>
+        <div class="stop-detail">1835 S Convention Center Dr · 8 stalls · Top off before bed</div>
+        <a href="https://www.google.com/maps/place/Tesla+Supercharger/@37.0797,-113.5781,15z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+      <div class="stop">
+        <div class="stop-name">3. Las Vegas, NV <span class="badge badge-free">DAY 2</span></div>
+        <div class="stop-detail">~90 mi from St. George · Multiple locations · Quick top-off if needed</div>
+        <a href="https://www.google.com/maps/search/Tesla+Supercharger+Las+Vegas" target="_blank" class="map-link">📍 Map</a>
+      </div>
+      <div class="stop">
+        <div class="stop-name">4. Barstow or Victorville, CA <span class="badge badge-free">DAY 2</span></div>
+        <div class="stop-detail">~200–230 mi from St. George · Last charge before LA</div>
+        <a href="https://www.google.com/maps/search/Tesla+Supercharger+Barstow+CA" target="_blank" class="map-link">📍 Map</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">💰</span>
+      <div>
+        <div class="section-title">Budget Estimate</div>
+        <div class="section-subtitle">2 days, 1 night</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="table-scroll">
+      <table class="summary-table">
+        <thead>
+          <tr><th>Category</th><th>Est. Cost</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>⚡ Charging (~250 kWh)</td><td>$70–$110</td></tr>
+          <tr><td>🏨 Hotel (1 night, St. George)</td><td>$100–$130</td></tr>
+          <tr><td>🍔 Food (2 days)</td><td>$60–$100</td></tr>
+          <tr><td>🎟️ Attractions</td><td>FREE</td></tr>
+          <tr><td><strong>GRAND TOTAL</strong></td><td><strong>$230–$340</strong></td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /overview -->
+
+<!-- ══════════════════════════════ DAY 1 ══════════════════════════════ -->
+<div id="day1" class="day-panel">
+
+  <div class="day-header">
+    <h2>🌄 Day 1 — Erie to St. George</h2>
+    <div class="day-meta">Friday June 13 · ~575 miles · ~8.5 hrs driving</div>
+    <div class="day-note">Depart ~6:00 AM MDT (sunrise 5:31 AM) · Arrive ~5:00–5:30 PM PDT</div>
+  </div>
+
+  <!-- MORNING -->
+  <div class="section open">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">🌅</span>
+      <div>
+        <div class="section-title">Morning Departure — Erie to Glenwood Springs</div>
+        <div class="section-subtitle">6:00 AM → ~9:15 AM · I-70 West through the Rockies</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="callout">
+        <strong>🏔️ The Scenery:</strong> This is one of the most stunning drives in America. I-70 climbs through the Eisenhower/Johnson Tunnel (11,013 ft), then drops through Vail, Avon, and the jaw-dropping Glenwood Canyon — 12 miles of sheer 2,000-ft red rock walls carved by the Colorado River. No stops needed; the drive itself is the reward.
+      </div>
+
+      <div class="stop">
+        <div class="stop-name">Eisenhower/Johnson Tunnel</div>
+        <div class="stop-detail">Mile 216 · ~1 hr from Erie · Summit of I-70 at 11,013 ft · No stop needed, just admire</div>
+      </div>
+
+      <div class="stop">
+        <div class="stop-name">Vail Pass & Glenwood Canyon <span class="badge badge-rec">SCENIC</span></div>
+        <div class="stop-detail">Mile 176–124 · The Colorado River runs alongside the highway through towering canyon walls · Pull-offs available if you want to stretch</div>
+        <div class="stop-tip">💡 If you need a quick dog stop, Glenwood Springs rest area at exit 116 has a grassy area right by the river.</div>
+        <a href="https://www.google.com/maps/place/Glenwood+Canyon/@39.5534,-107.3269,13z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="dog-card">
+        <div class="dog-label">🐾 Dog Walk Option · Glenwood Springs</div>
+        <div class="dog-name">Riverside Trail — Colorado River</div>
+        <div class="dog-detail">Flat, paved trail along the Colorado River · Shade from canyon walls · 10–15 min walk · Exit 116</div>
+        <a href="https://www.google.com/maps/place/Glenwood+Canyon+Rec+Trail/@39.5507,-107.3187,15z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRAND JUNCTION CHARGE -->
+  <div class="section open">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">⚡</span>
+      <div>
+        <div class="section-title">Grand Junction Supercharger</div>
+        <div class="section-subtitle">~9:30–10:00 AM · 266 mi from Erie · 25–35 min charge</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="charger-card">
+        <div class="charger-name">⚡ Grand Junction Supercharger</div>
+        <div class="charger-detail">2432 US-6 · Mesa Mall area · Multiple V3 stalls · 24/7<br>Surrounded by: Chick-fil-A, Chipotle, Starbucks, Panera</div>
+        <a href="https://www.google.com/maps/place/Tesla+Supercharger/@39.0649,-108.5489,15z" target="_blank" class="map-link">📍 Supercharger Map</a>
+      </div>
+
+      <div class="section-divider">BREAKFAST / FOOD NEAR CHARGER</div>
+
+      <div class="food-card must-eat">
+        <div class="food-label">☕ Breakfast Stop</div>
+        <div class="food-name">Kannah Creek Brewing Co.</div>
+        <div class="food-detail">Light, local option · Good breakfast menu · ~1 mi from charger · 4.3/5 Google</div>
+        <a href="https://www.google.com/maps/place/Kannah+Creek+Brewing+Co/@39.0738,-108.5631,15z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="food-card">
+        <div class="food-label">☕ Quick &amp; Easy</div>
+        <div class="food-name">Starbucks / Panera (Mesa Mall)</div>
+        <div class="food-detail">Right at the Supercharger · Grab-and-go while charging</div>
+      </div>
+
+      <div class="dog-card">
+        <div class="dog-label">🐾 Dog Walk · Grand Junction</div>
+        <div class="dog-name">Colorado Riverfront Trail</div>
+        <div class="dog-detail">Flat paved path along the Colorado River · 5–10 min from charger · Shade and water nearby · Good leg stretch</div>
+        <a href="https://www.google.com/maps/place/Riverside+Parkway+Trail/@39.0743,-108.5596,15z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="callout">
+        <strong>📍 Optional Detour:</strong> Colorado National Monument is 10 min from the charger — dramatic red rock canyons with 22 miles of scenic drive. Worth it if you want to stretch the morning and your timing is flexible. <strong>FREE with America the Beautiful pass.</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- UTAH CROSSING: TOWN BY TOWN -->
+  <div class="section open">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">🏜️</span>
+      <div>
+        <div class="section-title">Grand Junction → Utah → St. George</div>
+        <div class="section-subtitle">~10:00 AM → ~5:30 PM · Town by town · ~305 miles</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+
+      <div class="callout">
+        <strong>🗺️ The Route:</strong> I-70 W out of Grand Junction, across the Utah line, through high desert to Green River, then south on I-70 through canyon country to Cove Fort where you pick up I-15 South. Richfield → Beaver → Cedar City → St. George. The last 2 hours on I-15 are easy and fast.
+      </div>
+
+      <!-- TOWN TIMELINE -->
+      <div class="town-timeline">
+
+        <!-- UTAH STATE LINE -->
+        <div class="town-row">
+          <div class="town-time">~10:20 AM</div>
+          <div class="town-content">
+            <div class="town-name">Utah State Line <span class="badge badge-free">PHOTO</span></div>
+            <div class="town-detail">~25 mi from Grand Junction · I-70 W · Pull-off at welcome sign · Quick photo if you want it</div>
+          </div>
+        </div>
+
+        <!-- GREEN RIVER -->
+        <div class="town-row">
+          <div class="town-time">~11:00 AM</div>
+          <div class="town-content">
+            <div class="town-name">Green River, UT <span class="badge badge-opt">OPTIONAL STOP</span></div>
+            <div class="town-detail">Exit 164 · ~60 mi from Grand Junction · Small town, basic services</div>
+            <div class="town-note">⚠️ Honest assessment: food options here are very limited — a diner and a gas station. Fine for a gas/stretch/dog break if you need it, but don't count on a real meal. Better to push to Richfield or Cedar City.</div>
+            <a href="https://www.google.com/maps/place/Green+River,+Utah/@38.9994,-110.1557,13z" target="_blank" class="map-link">📍 Map</a>
+          </div>
+        </div>
+
+        <!-- PRICE / HELPER NOTE -->
+        <div class="town-row">
+          <div class="town-time">~11:45 AM</div>
+          <div class="town-content">
+            <div class="town-name">San Rafael Swell — Scenic Stretch</div>
+            <div class="town-detail">I-70 cuts through dramatic canyon and mesa country for ~50 miles · No town, but stunning geology · Look for the San Rafael Reef to your right</div>
+            <div class="town-note">💡 This is one of the most underrated stretches of I-70. No stops needed — just enjoy.</div>
+          </div>
+        </div>
+
+        <!-- COVE FORT -->
+        <div class="town-row">
+          <div class="town-time">~12:30 PM</div>
+          <div class="town-content">
+            <div class="town-name">Cove Fort — I-70 Ends, Turn South <span class="badge badge-rec">TURN HERE</span></div>
+            <div class="town-detail">Exit 135 · I-70 terminates · Merge onto I-15 South toward St. George · ~150 miles to go</div>
+            <div class="town-note">💡 There's a small rest area with grass here — easy dog stop at the junction.</div>
+            <a href="https://www.google.com/maps/place/Cove+Fort,+UT+84713/@38.6056,-112.5623,14z" target="_blank" class="map-link">📍 Map</a>
+          </div>
+        </div>
+
+        <!-- RICHFIELD -->
+        <div class="town-row richfield-row">
+          <div class="town-time">~12:45 PM</div>
+          <div class="town-content">
+            <div class="town-name">Richfield, UT <span class="badge badge-must">EARLY LUNCH</span></div>
+            <div class="town-detail">Exit 40 · ~15 mi south of Cove Fort · Good stop if you left Erie early and are hungry by noon</div>
+            <div class="lunch-box early-lunch">
+              <div class="lunch-box-label">🍔 If you're hungry at noon — eat here</div>
+              <div class="food-name-inline">Freddy's Frozen Custard &amp; Steakburgers</div>
+              <div class="food-detail-inline">Best fast-casual in Richfield · 4.4/5 Google · Excellent burgers + custard · Quick</div>
+              <a href="https://www.google.com/maps/place/Freddy%27s+Frozen+Custard+%26+Steakburgers/@38.7726,-112.0841,15z" target="_blank" class="map-link">📍 Map</a>
+              <div style="margin-top:8px">
+              <div class="food-name-inline">Main Street Diner</div>
+              <div class="food-detail-inline">Local sit-down diner · Solid comfort food · 4.2/5 Google · 5 min from freeway</div>
+              <a href="https://www.google.com/maps/place/Main+Street+Diner+Richfield/@38.7724,-112.0850,15z" target="_blank" class="map-link">📍 Map</a>
+              </div>
+            </div>
+            <div class="charger-inline">
+              <span class="charger-tag">⚡ Supercharger here</span> · Optional top-off if range is below 50% · 4 stalls
+              <a href="https://www.google.com/maps/search/Tesla+Supercharger+Richfield+UT" target="_blank" class="map-link">📍 Map</a>
+            </div>
+            <div class="dog-inline">🐾 Fremont Indian State Park is 20 min east — skip unless you have time. City park near Main St for a quick walk.</div>
+          </div>
+        </div>
+
+        <!-- BEAVER -->
+        <div class="town-row">
+          <div class="town-time">~1:30 PM</div>
+          <div class="town-content">
+            <div class="town-name">Beaver, UT <span class="badge badge-opt">OPTIONAL</span></div>
+            <div class="town-detail">Exit 112 · ~45 min south of Richfield · Small town, decent food options · Good mid-afternoon stretch</div>
+            <div class="lunch-box mid-lunch">
+              <div class="lunch-box-label">🍔 If lunch got pushed to mid-afternoon — eat here</div>
+              <div class="food-name-inline">Arshel's Cafe</div>
+              <div class="food-detail-inline">Beloved local institution since 1955 · 4.3/5 Google · Homestyle plates, great pies · No-frills diner energy</div>
+              <a href="https://www.google.com/maps/place/Arshel%27s+Cafe/@38.2732,-112.6391,15z" target="_blank" class="map-link">📍 Map</a>
+              <div style="margin-top:8px">
+              <div class="food-name-inline">Crazy Cow Cafe</div>
+              <div class="food-detail-inline">Cheerful roadside stop · 4.2/5 Google · Burgers, sandwiches, milkshakes · Popular with truckers (good sign)</div>
+              <a href="https://www.google.com/maps/place/Crazy+Cow+Cafe/@38.2804,-112.6410,15z" target="_blank" class="map-link">📍 Map</a>
+              </div>
+            </div>
+            <div class="dog-inline">🐾 Pioneer Park in Beaver has grass and shade — a solid 10-min dog walk</div>
+            <a href="https://www.google.com/maps/place/Beaver,+UT+84713/@38.2735,-112.6424,13z" target="_blank" class="map-link">📍 Beaver Map</a>
+          </div>
+        </div>
+
+        <!-- CEDAR CITY -->
+        <div class="town-row">
+          <div class="town-time">~2:15 PM</div>
+          <div class="town-content">
+            <div class="town-name">Cedar City, UT <span class="badge badge-opt">OPTIONAL</span></div>
+            <div class="town-detail">Exit 57–62 · Biggest town before St. George · ~45 min north of St. George · Best food options on this stretch</div>
+            <div class="lunch-box late-lunch">
+              <div class="lunch-box-label">🍔 If you pushed lunch to late afternoon — eat here</div>
+              <div class="food-name-inline">Centro at SkyGarden</div>
+              <div class="food-detail-inline">Cedar City's most-loved casual spot · 4.5/5 Google · Fresh salads, sandwiches, local flavor · Worth stopping for</div>
+              <a href="https://www.google.com/maps/place/Centro+at+SkyGarden/@37.6771,-113.0605,15z" target="_blank" class="map-link">📍 Map</a>
+              <div style="margin-top:8px">
+              <div class="food-name-inline">Milt's Stage Stop</div>
+              <div class="food-detail-inline">Classic roadhouse burgers · Open since the 1960s · 4.3/5 Google · Consistently good</div>
+              <a href="https://www.google.com/maps/place/Milt%27s+Stage+Stop/@37.6609,-113.0764,15z" target="_blank" class="map-link">📍 Map</a>
+              </div>
+            </div>
+            <div class="dog-inline">🐾 Canyon Discovery Park · Flat grassy park off I-15 · Good for a proper 15-min stretch before the final push</div>
+            <a href="https://www.google.com/maps/place/Canyon+Discovery+Park/@37.6776,-113.0599,15z" target="_blank" class="map-link">📍 Park Map</a>
+          </div>
+        </div>
+
+        <!-- ST GEORGE -->
+        <div class="town-row town-row-final">
+          <div class="town-time">~3:00 PM<br><span style="font-size:0.72rem;opacity:0.7">PDT</span></div>
+          <div class="town-content">
+            <div class="town-name">St. George, UT 🏁 <span class="badge badge-must">OVERNIGHT</span></div>
+            <div class="town-detail">~30 min south of Cedar City · Check in, charge up, decompress · Sunset at 8:00 PM — still plenty of evening ahead</div>
+            <div class="town-note">💡 Arriving 3–4 PM gives you time to check in, walk the dog properly, and have a relaxed dinner. Best case timing.</div>
+          </div>
+        </div>
+
+      </div><!-- /town-timeline -->
+
+      <!-- TIMING SUMMARY BOX -->
+      <div class="callout" style="margin-top:12px">
+        <strong>🕐 Lunch timing guide at a glance:</strong><br>
+        Leaving Erie at <strong>6 AM</strong> → Grand Junction ~9:30 AM → eat in <strong>Richfield (~12:45 PM)</strong><br>
+        Leaving Erie at <strong>7 AM</strong> → Grand Junction ~10:30 AM → eat in <strong>Beaver (~2:00 PM)</strong><br>
+        Leaving Erie at <strong>8 AM</strong> → Grand Junction ~11:30 AM → eat in <strong>Cedar City (~3:00 PM)</strong> or just wait for dinner in St. George
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ST GEORGE ARRIVAL -->
+  <div class="section open">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">🏨</span>
+      <div>
+        <div class="section-title">St. George — Overnight Stop</div>
+        <div class="section-subtitle">Arrive ~4:30–5:30 PM PDT · Sunset 8:00 PM</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="overnight-banner">
+        <div class="ob-title">🌵 St. George, Utah</div>
+        <div class="ob-sub">Gateway to Zion · Red rock country · A great overnight</div>
+      </div>
+
+      <div class="section-divider">HOTEL</div>
+
+      <div class="hotel-card top-pick">
+        <div class="hotel-top-label">⭐ Top Pick</div>
+        <div class="hotel-name">La Quinta Inn &amp; Suites by Wyndham St. George</div>
+        <div class="hotel-meta">91 E 2680 S, St. George · <span class="rating-stars">★ 9.4/10</span> Exceptional (1,943 reviews)</div>
+        <div class="hotel-quote">"Very clean hotel with good amenities. Very quiet even though I-15 is close by. Staff really nice and friendly."</div>
+        <div class="hotel-meta">🐾 Pet-friendly · All sizes welcome · $99–$115/night · Pool + gym · Free WiFi</div>
+        <a href="https://www.google.com/maps/place/La+Quinta+Inn+%26+Suites+by+Wyndham+St.+George/@37.0767,-113.5776,15z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="hotel-card">
+        <div class="hotel-name">Best Western Coral Hills</div>
+        <div class="hotel-meta">125 E Saint George Blvd · <span class="rating-stars">★ 9.2/10</span> Wonderful (1,001 reviews)</div>
+        <div class="hotel-quote">"Beds comfortable, room clean, breakfast hot with great variety. Staff friendly. Would stay again."</div>
+        <div class="hotel-meta">🐾 Pet-friendly · Indoor + outdoor pool · Free breakfast · ~$100–$115/night</div>
+        <a href="https://www.google.com/maps/place/Best+Western+Coral+Hills/@37.1067,-113.5717,15z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="section-divider">CHARGING TONIGHT</div>
+
+      <div class="charger-card">
+        <div class="charger-name">⚡ St. George Supercharger</div>
+        <div class="charger-detail">1835 S Convention Center Dr · 8 stalls · 5 min from La Quinta · Top off tonight for easy morning departure</div>
+        <a href="https://www.google.com/maps/place/Tesla+Supercharger/@37.0797,-113.5781,15z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="section-divider">DINNER</div>
+
+      <div class="food-card must-eat">
+        <div class="food-label">🍽️ Dinner · St. George</div>
+        <div class="food-name">Cliffside Restaurant</div>
+        <div class="food-detail">Perched above the city with epic views · 4.5/5 Google · American fare, good steaks · Worth the slight splurge after a long drive</div>
+        <a href="https://www.google.com/maps/place/Cliffside+Restaurant/@37.1042,-113.5831,15z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="food-card">
+        <div class="food-label">🍽️ Casual Option</div>
+        <div class="food-name">Bear Paw Cafe</div>
+        <div class="food-detail">Beloved local breakfast/brunch spot · Also great for early dinner · 4.4/5 Google · Very walkable from hotels on Bluff St</div>
+        <a href="https://www.google.com/maps/place/Bear+Paw+Cafe/@37.1181,-113.5722,17z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="dog-card">
+        <div class="dog-label">🐾 Evening Dog Walk · St. George</div>
+        <div class="dog-name">Middleton Dog Park / Green Valley Park</div>
+        <div class="dog-detail">Off-leash area · Flat grassy park · 10 min from La Quinta · Good for a proper post-drive run</div>
+        <a href="https://www.google.com/maps/place/Red+Cliffs+Desert+Reserve/@37.1612,-113.5924,13z" target="_blank" class="map-link">📍 Red Cliffs Area Map</a>
+      </div>
+
+      <div class="callout">
+        <strong>🌅 Evening Bonus:</strong> Red Cliffs Desert Reserve trails are beautiful in the late afternoon light — the red sandstone glows. It's dog-friendly and just 10 min from the hotel strip. Even a 20-min walk is stunning.
+      </div>
+    </div>
+  </div>
+
+</div><!-- /day1 -->
+
+<!-- ══════════════════════════════ DAY 2 ══════════════════════════════ -->
+<div id="day2" class="day-panel">
+
+  <div class="day-header">
+    <h2>🌊 Day 2 — St. George to Los Angeles</h2>
+    <div class="day-meta">Saturday June 14 · ~420 miles · ~5.5 hrs driving</div>
+    <div class="day-note">Depart ~7:00 AM PDT · Arrive LA ~12:30–1:30 PM · Sunset 8:03 PM</div>
+  </div>
+
+  <!-- MORNING DEPARTURE -->
+  <div class="section open">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">☕</span>
+      <div>
+        <div class="section-title">Morning Departure — St. George</div>
+        <div class="section-subtitle">7:00 AM PDT · Sunrise was 5:24 AM · Full charge from last night</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="callout">
+        <strong>🗺️ The Route:</strong> I-15 South the whole way. From St. George you'll pass through the northwest corner of Arizona (just 30 min), then into Nevada, through or around Las Vegas, and across the Mojave into the Inland Empire. Pure freeway — easy and fast.
+      </div>
+
+      <div class="section-divider">BREAKFAST — ST. GEORGE</div>
+
+      <div class="food-card must-eat">
+        <div class="food-label">☕ Best Breakfast · Opens 7 AM</div>
+        <div class="food-name">Bear Paw Cafe</div>
+        <div class="food-detail">St. George's most-loved breakfast spot · 4.4/5 Google · Eggs Benedict, French toast, excellent coffee · Worth 30 min if you're not in a rush · Walkable from hotels on Bluff St</div>
+        <a href="https://www.google.com/maps/place/Bear+Paw+Cafe/@37.1181,-113.5722,17z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="food-card">
+        <div class="food-label">☕ Quick &amp; Solid · Opens Early</div>
+        <div class="food-name">Croshaw's Cafe</div>
+        <div class="food-detail">Straightforward breakfast diner · 4.3/5 Google · Fast service, good eggs and pancakes · Good option if Bear Paw has a wait</div>
+        <a href="https://www.google.com/maps/place/Croshaw%27s+Cafe/@37.1064,-113.5831,15z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="food-card">
+        <div class="food-label">☕ Fastest Option</div>
+        <div class="food-name">Hotel Breakfast + Coffee Drive-Through</div>
+        <div class="food-detail">La Quinta free continental · Grab coffee at Dutch Bros on Bluff St on the way out · On the freeway by 7 AM</div>
+        <a href="https://www.google.com/maps/search/Dutch+Bros+Coffee+St+George+UT" target="_blank" class="map-link">📍 Dutch Bros Map</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARIZONA STRIP + NEVADA -->
+  <div class="section open">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">🏜️</span>
+      <div>
+        <div class="section-title">Arizona Strip → Las Vegas</div>
+        <div class="section-subtitle">~7:00–9:00 AM · ~90 miles · Virgin River Gorge</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="stop">
+        <div class="stop-name">Virgin River Gorge <span class="badge badge-rec">SCENIC</span></div>
+        <div class="stop-detail">~20 min south of St. George · I-15 drops through a dramatic 1,000-ft canyon carved by the Virgin River · No stop needed — just enjoy the drive</div>
+        <div class="stop-tip">💡 One of the most underrated scenic stretches on I-15. Keep your eyes open.</div>
+        <a href="https://www.google.com/maps/place/Virgin+River+Gorge/@36.8466,-113.8764,13z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="stop">
+        <div class="stop-name">Las Vegas, NV <span class="badge badge-opt">OPTIONAL STOP</span></div>
+        <div class="stop-detail">~90 mi from St. George · ~1 hr 20 min · Multiple Supercharger locations if you need a top-off · Most people skip it and push straight to Barstow</div>
+        <a href="https://www.google.com/maps/search/Tesla+Supercharger+Las+Vegas+NV" target="_blank" class="map-link">📍 Vegas Superchargers</a>
+      </div>
+
+      <div class="section-divider">IF YOU STOP IN LAS VEGAS (~8:30–9:00 AM)</div>
+
+      <div class="food-card">
+        <div class="food-label">☕ Late Breakfast · Henderson area (south Vegas, on your route)</div>
+        <div class="food-name">Honey Salt</div>
+        <div class="food-detail">Farm-to-table brunch · 4.5/5 Google · One of Vegas's best breakfast spots · Eggs, grain bowls, excellent pastries · ~5 min off I-15</div>
+        <a href="https://www.google.com/maps/place/Honey+Salt/@36.1446,-115.3272,15z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="food-card">
+        <div class="food-label">☕ Quick &amp; Good · On the Way</div>
+        <div class="food-name">Black Bear Diner — Henderson</div>
+        <div class="food-detail">Classic American diner · 4.3/5 Google · Huge portions, great pancakes · Fast service · Dog-friendly patio</div>
+        <a href="https://www.google.com/maps/place/Black+Bear+Diner/@36.0136,-115.1274,15z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="food-card">
+        <div class="food-label">☕ Fastest Option · Drive-Through</div>
+        <div class="food-name">In-N-Out — Multiple Vegas locations</div>
+        <div class="food-detail">If you're charging anyway · Grab a burger and go · Already in California mode</div>
+        <a href="https://www.google.com/maps/search/In-N-Out+Burger+Las+Vegas+near+I-15" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="dog-card">
+        <div class="dog-label">🐾 Dog Stop Option · Jean, NV</div>
+        <div class="dog-name">Jean Rest Area · Mile Marker 12</div>
+        <div class="dog-detail">Small rest stop south of Las Vegas · Clean · Good for a quick walk before the Mojave stretch · Better than stopping in Vegas proper</div>
+        <a href="https://www.google.com/maps/place/Jean,+NV+89019/@35.7784,-115.3329,13z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOJAVE -->
+  <div class="section open">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">☀️</span>
+      <div>
+        <div class="section-title">Las Vegas → Barstow — The Mojave</div>
+        <div class="section-subtitle">~9:00–10:45 AM · ~155 miles · Charge in Barstow</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="callout">
+        <strong>🌡️ Heat Note:</strong> It's June in the Mojave. Temperatures can be 100°F+ by mid-morning. This is the one stretch to power through without long stops. Your pup will be fine in an air-conditioned car, but don't leave the car off.
+      </div>
+
+      <div class="stop">
+        <div class="stop-name">Baker, CA — World's Tallest Thermometer <span class="badge badge-opt">OPTIONAL</span></div>
+        <div class="stop-detail">Exit 246 on I-15 · ~100 mi from St. George · Roadside novelty — 134-ft thermometer · Quick photo op · Gas stations here</div>
+        <div class="stop-tip">⚠️ Food options in Baker are very limited — Mad Greek Cafe is the one decent sit-down spot but it's hit or miss. Better to push to Barstow for a real meal.</div>
+        <a href="https://www.google.com/maps/place/Baker,+CA+92309/@35.2673,-116.0719,13z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="charger-card">
+        <div class="charger-name">⚡ Barstow Supercharger</div>
+        <div class="charger-detail">Lenwood Rd · 16+ stalls · ~195 mi from St. George · 20–25 min charge · Gets you comfortably home</div>
+        <a href="https://www.google.com/maps/place/Tesla+Supercharger/@34.8797,-117.0309,15z" target="_blank" class="map-link">📍 Supercharger Map</a>
+      </div>
+
+      <div class="section-divider">LUNCH — BARSTOW (~10:00–11:00 AM)</div>
+
+      <div class="food-card must-eat">
+        <div class="food-label">🍔 The California Classic · Right at Supercharger</div>
+        <div class="food-name">In-N-Out Burger</div>
+        <div class="food-detail">Steps from the Supercharger · 4.5/5 Google · Double-Double, Animal Style if you haven't had one in a while · Drive-through or dine-in · The obvious choice</div>
+        <a href="https://www.google.com/maps/place/In-N-Out+Burger/@34.8793,-117.0285,17z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="food-card">
+        <div class="food-label">🌮 Best Sit-Down · 5 min from Supercharger</div>
+        <div class="food-name">Idle Spurs Steakhouse</div>
+        <div class="food-detail">Barstow's most-loved restaurant · 4.4/5 Google · Western roadhouse vibe · Good steaks, burgers, and salads · Worth it if you want a proper meal before home</div>
+        <a href="https://www.google.com/maps/place/Idle+Spurs+Steakhouse/@34.8952,-117.0224,15z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="food-card">
+        <div class="food-label">🌯 Fast Casual · Near Supercharger</div>
+        <div class="food-name">Chipotle — Barstow</div>
+        <div class="food-detail">On Lenwood Rd near the charger · Reliable, quick · Good if you want something lighter than a burger · 4.1/5 Google</div>
+        <a href="https://www.google.com/maps/search/Chipotle+Barstow+CA+Lenwood" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="food-card">
+        <div class="food-label">☕ Coffee + Light Bite</div>
+        <div class="food-name">Starbucks — Barstow</div>
+        <div class="food-detail">Also on Lenwood Rd · If you're not hungry yet and just need fuel for the last 90 min home</div>
+        <a href="https://www.google.com/maps/search/Starbucks+Barstow+CA+Lenwood" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="dog-card">
+        <div class="dog-label">🐾 Dog Walk · Barstow</div>
+        <div class="dog-name">Grassy strip near Lenwood Rd commercial area</div>
+        <div class="dog-detail">Keep it brief — it's hot · Morning shade on the north side of buildings · Just enough for a stretch and a bathroom break before the final push</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOME STRETCH -->
+  <div class="section open">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">🏠</span>
+      <div>
+        <div class="section-title">Barstow → Los Angeles — The Home Stretch</div>
+        <div class="section-subtitle">~11:00 AM → ~12:30–1:30 PM · ~135 miles · I-15 to I-10 / I-210</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="callout">
+        <strong>🛣️ Getting In:</strong> From Barstow, I-15 takes you southwest through Cajon Pass and into the San Bernardino Valley. For LA proper, you can take I-10 West (toward downtown), I-210 West (for the Valley), or stay on I-15 south and pick up I-215/60. Check your Tesla nav for current traffic — this stretch varies a lot on Saturday midday.
+      </div>
+
+      <div class="stop">
+        <div class="stop-name">Cajon Pass <span class="badge badge-rec">SCENIC</span></div>
+        <div class="stop-detail">I-15 at ~4,300 ft · Quick descent into the LA Basin · San Bernardino Mountains on both sides · Nice moment before the city</div>
+      </div>
+
+      <div class="stop">
+        <div class="stop-name">Optional Victorville Supercharger</div>
+        <div class="stop-detail">If you skipped Barstow or need more range · Exit 141 · 12 V3 stalls</div>
+        <a href="https://www.google.com/maps/search/Tesla+Supercharger+Victorville+CA" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="section-divider">IF YOU SKIPPED BARSTOW — EAT IN VICTORVILLE</div>
+
+      <div class="food-card">
+        <div class="food-label">🍔 Lunch · Victorville (Exit 141)</div>
+        <div class="food-name">In-N-Out Burger — Victorville</div>
+        <div class="food-detail">Right near the Supercharger · Same deal as Barstow · 4.5/5 Google</div>
+        <a href="https://www.google.com/maps/search/In-N-Out+Burger+Victorville+CA" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="food-card">
+        <div class="food-label">🥗 Sit-Down Option · Victorville</div>
+        <div class="food-name">Panera Bread or Chick-fil-A — Bear Valley Rd</div>
+        <div class="food-detail">Multiple solid fast-casual options clustered near the freeway exits · Quick and reliable · Good if you want something other than a burger this late in the drive</div>
+        <a href="https://www.google.com/maps/search/restaurants+Victorville+CA+near+I-15" target="_blank" class="map-link">📍 Map</a>
+      </div>
+
+      <div class="arrive-banner">
+        <span class="ab-emoji">🎉</span>
+        <div class="ab-title">Welcome Home, Nikki!</div>
+        <div class="ab-sub">Los Angeles · ~12:30–1:30 PM PST · Sunset at 8:03 PM · You've got the whole afternoon</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /day2 -->
+
+<!-- ══════════════════════════════ LOGISTICS ══════════════════════════════ -->
+<div id="logistics" class="day-panel">
+
+  <div class="day-header">
+    <h2>🗂️ Logistics &amp; Quick Reference</h2>
+    <div class="day-meta">Charging · Hotels · Dog Tips · Key Links</div>
+  </div>
+
+  <!-- ALL CHARGERS -->
+  <div class="section open">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">⚡</span>
+      <div>
+        <div class="section-title">All Supercharger Stops</div>
+        <div class="section-subtitle">4 planned stops · All 24/7</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="charger-card">
+        <div class="charger-name">1 · Grand Junction, CO — Day 1</div>
+        <div class="charger-detail">2432 US-6 · 266 mi from Erie · Mall area · Food nearby · Charge 25–35 min</div>
+        <a href="https://www.google.com/maps/place/Tesla+Supercharger/@39.0649,-108.5489,15z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+      <div class="charger-card">
+        <div class="charger-name">1B · Richfield, UT — Optional Day 1 Top-Off</div>
+        <div class="charger-detail">Exit 40 · Only if needed · 4 stalls</div>
+        <a href="https://www.google.com/maps/search/Tesla+Supercharger+Richfield+UT" target="_blank" class="map-link">📍 Map</a>
+      </div>
+      <div class="charger-card">
+        <div class="charger-name">2 · St. George, UT — Overnight Charge</div>
+        <div class="charger-detail">1835 S Convention Center Dr · 8 stalls · Top off overnight · 5 min from La Quinta</div>
+        <a href="https://www.google.com/maps/place/Tesla+Supercharger/@37.0797,-113.5781,15z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+      <div class="charger-card">
+        <div class="charger-name">3 · Las Vegas, NV — Day 2 Optional</div>
+        <div class="charger-detail">~90 mi from St. George · Multiple locations · Only needed if range is low after overnight</div>
+        <a href="https://www.google.com/maps/search/Tesla+Supercharger+Las+Vegas+NV" target="_blank" class="map-link">📍 Map</a>
+      </div>
+      <div class="charger-card">
+        <div class="charger-name">4 · Barstow, CA — Day 2 Main Stop</div>
+        <div class="charger-detail">Lenwood Rd · 16+ stalls · ~195 mi from St. George · In-N-Out right here · 20–25 min charge to get home comfortably</div>
+        <a href="https://www.google.com/maps/place/Tesla+Supercharger/@34.8797,-117.0309,15z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+      <a href="https://www.tesla.com/findus?v=2&bounds=42,-108,34,-120&zoom=6&filters=supercharger" target="_blank" class="map-link" style="display:block;margin-top:10px;text-align:center;">🗺️ View All Superchargers on Tesla Map</a>
+    </div>
+  </div>
+
+  <!-- HOTEL -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">🏨</span>
+      <div>
+        <div class="section-title">Hotel — St. George, UT</div>
+        <div class="section-subtitle">1 night · Friday June 13</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="hotel-card top-pick">
+        <div class="hotel-top-label">⭐ Recommended</div>
+        <div class="hotel-name">La Quinta Inn &amp; Suites by Wyndham St. George</div>
+        <div class="hotel-meta">91 E 2680 S · <span class="rating-stars">★ 9.4/10</span> Exceptional · 1,943 reviews · ~$99–$115/night</div>
+        <div class="hotel-quote">"Pets welcome, all sizes. Pool, gym, quiet location, friendly staff."</div>
+        <a href="https://www.google.com/maps/place/La+Quinta+Inn+%26+Suites+by+Wyndham+St.+George/@37.0767,-113.5776,15z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+      <div class="hotel-card">
+        <div class="hotel-name">Best Western Coral Hills</div>
+        <div class="hotel-meta">125 E Saint George Blvd · <span class="rating-stars">★ 9.2/10</span> Wonderful · ~$100–$115/night</div>
+        <div class="hotel-meta">🐾 Pet-friendly · Indoor + outdoor pool · Free breakfast</div>
+        <a href="https://www.google.com/maps/place/Best+Western+Coral+Hills/@37.1067,-113.5717,15z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOG TIPS -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">🐾</span>
+      <div>
+        <div class="section-title">Dog Stops Summary</div>
+        <div class="section-subtitle">All walks along the route</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="stop">
+        <div class="stop-name">Day 1 · Glenwood Springs</div>
+        <div class="stop-detail">Riverside Trail · Shaded, flat, Colorado River · Exit 116 · 10–15 min</div>
+        <a href="https://www.google.com/maps/place/Glenwood+Canyon+Rec+Trail/@39.5507,-113.3187,15z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+      <div class="stop">
+        <div class="stop-name">Day 1 · Grand Junction</div>
+        <div class="stop-detail">Colorado Riverfront Trail · Flat paved path · Near Supercharger · Good shade</div>
+        <a href="https://www.google.com/maps/place/Riverside+Parkway+Trail/@39.0743,-108.5596,15z" target="_blank" class="map-link">📍 Map</a>
+      </div>
+      <div class="stop">
+        <div class="stop-name">Day 1 · Richfield, UT</div>
+        <div class="stop-detail">City park near Main St · Grass + shade · Also the Supercharger stop · Good early-lunch stretch</div>
+      </div>
+      <div class="stop">
+        <div class="stop-name">Day 1 · Beaver, UT</div>
+        <div class="stop-detail">Pioneer Park · Grass and trees · 10 min walk · Mid-afternoon stretch option</div>
+      </div>
+      <div class="stop">
+        <div class="stop-name">Day 1 · Cedar City (Lunch Stop)</div>
+        <div class="stop-detail">Canyon Discovery Park · Grassy, flat · Good stretch before St. George</div>
+      </div>
+      <div class="stop">
+        <div class="stop-name">Day 1 Evening · St. George</div>
+        <div class="stop-detail">Red Cliffs area trails · Beautiful sunset walk · Proper off-leash areas nearby</div>
+      </div>
+      <div class="stop">
+        <div class="stop-name">Day 2 · Jean, NV Rest Area</div>
+        <div class="stop-detail">Small rest stop south of Las Vegas · Quick grass stop before Mojave</div>
+      </div>
+      <div class="stop">
+        <div class="stop-name">Day 2 · Barstow</div>
+        <div class="stop-detail">Near Supercharger · Quick walk · Hot — keep it brief · Early morning shade near buildings</div>
+      </div>
+      <div class="callout">
+        <strong>🌡️ Heat reminder:</strong> Day 2 crosses the Mojave in mid-morning June heat. Never leave the car off with the dog inside. Tesla's Dog Mode is your friend.
+      </div>
+    </div>
+  </div>
+
+  <!-- KEY LINKS -->
+  <div class="section">
+    <div class="section-header" onclick="toggleSection(this)">
+      <span class="section-icon">🔗</span>
+      <div>
+        <div class="section-title">All Map Links</div>
+        <div class="section-subtitle">Quick access to every stop</div>
+      </div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="section-body">
+      <div class="section-divider">Day 1 — Scenic</div>
+      <a href="https://www.google.com/maps/place/Glenwood+Canyon/@39.5534,-107.3269,13z" target="_blank" class="map-link" style="display:inline-block;margin:4px 4px 4px 0">📍 Glenwood Canyon</a>
+      <a href="https://www.google.com/maps/place/Colorado+National+Monument/@39.0453,-108.6971,13z" target="_blank" class="map-link" style="display:inline-block;margin:4px 4px 4px 0">📍 Colorado Nat'l Monument</a>
+      <a href="https://www.google.com/maps/place/Green+River,+Utah/@38.9994,-110.1557,13z" target="_blank" class="map-link" style="display:inline-block;margin:4px 4px 4px 0">📍 Green River UT</a>
+
+      <div class="section-divider">Day 1 — Food</div>
+      <a href="https://www.google.com/maps/place/Kannah+Creek+Brewing+Co/@39.0738,-108.5631,15z" target="_blank" class="map-link" style="display:inline-block;margin:4px 4px 4px 0">📍 Kannah Creek (GJ Breakfast)</a>
+      <a href="https://www.google.com/maps/place/Centro+at+SkyGarden/@37.6771,-113.0605,15z" target="_blank" class="map-link" style="display:inline-block;margin:4px 4px 4px 0">📍 Centro Cedar City</a>
+      <a href="https://www.google.com/maps/place/Cliffside+Restaurant/@37.1042,-113.5831,15z" target="_blank" class="map-link" style="display:inline-block;margin:4px 4px 4px 0">📍 Cliffside Restaurant (SGU)</a>
+      <a href="https://www.google.com/maps/place/Bear+Paw+Cafe/@37.1181,-113.5722,17z" target="_blank" class="map-link" style="display:inline-block;margin:4px 4px 4px 0">📍 Bear Paw Cafe (SGU)</a>
+
+      <div class="section-divider">Day 2 — Scenic &amp; Food</div>
+      <a href="https://www.google.com/maps/place/Virgin+River+Gorge/@36.8466,-113.8764,13z" target="_blank" class="map-link" style="display:inline-block;margin:4px 4px 4px 0">📍 Virgin River Gorge</a>
+      <a href="https://www.google.com/maps/place/Baker,+CA+92309/@35.2673,-116.0719,13z" target="_blank" class="map-link" style="display:inline-block;margin:4px 4px 4px 0">📍 Baker CA</a>
+      <a href="https://www.google.com/maps/place/In-N-Out+Burger/@34.8793,-117.0285,17z" target="_blank" class="map-link" style="display:inline-block;margin:4px 4px 4px 0">📍 In-N-Out Barstow</a>
+
+      <div class="section-divider">Superchargers</div>
+      <a href="https://www.google.com/maps/place/Tesla+Supercharger/@39.0649,-108.5489,15z" target="_blank" class="map-link" style="display:inline-block;margin:4px 4px 4px 0">⚡ Grand Junction</a>
+      <a href="https://www.google.com/maps/search/Tesla+Supercharger+Richfield+UT" target="_blank" class="map-link" style="display:inline-block;margin:4px 4px 4px 0">⚡ Richfield UT</a>
+      <a href="https://www.google.com/maps/place/Tesla+Supercharger/@37.0797,-113.5781,15z" target="_blank" class="map-link" style="display:inline-block;margin:4px 4px 4px 0">⚡ St. George</a>
+      <a href="https://www.google.com/maps/search/Tesla+Supercharger+Las+Vegas+NV" target="_blank" class="map-link" style="display:inline-block;margin:4px 4px 4px 0">⚡ Las Vegas</a>
+      <a href="https://www.google.com/maps/place/Tesla+Supercharger/@34.8797,-117.0309,15z" target="_blank" class="map-link" style="display:inline-block;margin:4px 4px 4px 0">⚡ Barstow</a>
+    </div>
+  </div>
+
+</div><!-- /logistics -->
+
+<script>
+  function showDay(id) {
+    document.querySelectorAll('.day-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.currentTarget.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleSection(header) {
+    const section = header.closest('.section');
+    section.classList.toggle('open');
+  }
+</script>
+
+</body>
+</html>
